@@ -3,81 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极简在线 HTML 编辑器</title>
+    <title>HTML 实时编辑器 Pro</title>
     <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --header-color: #252526;
+            --accent-color: #007acc;
+            --text-color: #d4d4d4;
+        }
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden;
+            background: var(--bg-color);
         }
         header {
-            background: #2c3e50;
+            background: var(--header-color);
             color: white;
             padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #333;
         }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #555; }
+        .btn-danger { background: #a93226; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-primary { background: var(--accent-color); }
+        .btn-primary:hover { background: #1a8ad4; }
+
         .container {
             display: flex;
             flex: 1;
-            height: calc(100vh - 50px);
+            overflow: hidden;
         }
         textarea {
             width: 50%;
             height: 100%;
             border: none;
             padding: 15px;
-            font-family: "Fira Code", monospace;
+            font-family: "Consolas", "Monaco", monospace;
             font-size: 14px;
-            background: #1e1e1e;
-            color: #d4d4d4;
+            background: var(--bg-color);
+            color: var(--text-color);
             resize: none;
             outline: none;
+            border-right: 1px solid #333;
         }
         iframe {
             width: 50%;
             height: 100%;
             border: none;
-            background: #fff;
-        }
-        .btn {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background: #2ecc71;
+            background: white;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <strong>Gemini Code Runner</strong>
-    <span>实时预览模式</span>
+    <div style="font-weight: bold; letter-spacing: 1px;">CODE RUNNER</div>
+    <div class="toolbar">
+        <button class="btn btn-primary" onclick="pasteCode()">📋 粘贴代码</button>
+        <button class="btn btn-danger" onclick="clearCode()">🗑️ 清除全部</button>
+    </div>
 </header>
 
 <div class="container">
-    <textarea id="code-input" placeholder="在这里输入 HTML/CSS/JS 代码..." spellcheck="false"><h1>Hello, World!</h1>
-<p>欢迎使用实时预览编辑器。</p>
-
-<style>
-  body { text-align: center; padding-top: 50px; color: #333; }
-  h1 { color: #3498db; }
-</style>
-
-<script>
-  console.log('编辑器已就绪！');
-</script></textarea>
+    <textarea id="code-input" placeholder="请在此粘贴或编写 HTML 代码..." spellcheck="false"><h1>欢迎使用</h1>
+<p>点击上方按钮清空内容，或直接开始编写。</p></textarea>
     <iframe id="preview"></iframe>
 </div>
 
@@ -93,10 +103,27 @@
         iframeDoc.close();
     }
 
-    // 监听输入事件，实现实时更新
-    input.addEventListener('input', updatePreview);
+    // 清除功能
+    function clearCode() {
+        if(confirm('确定要清除所有代码吗？')) {
+            input.value = '';
+            updatePreview();
+            input.focus();
+        }
+    }
 
-    // 页面加载时初始化预览
+    // 粘贴功能 (使用 Clipboard API)
+    async function pasteCode() {
+        try {
+            const text = await navigator.clipboard.readText();
+            input.value = text;
+            updatePreview();
+        } catch (err) {
+            alert('粘贴失败：请确保已授予浏览器剪贴板访问权限，或使用 Ctrl+V 访问。');
+        }
+    }
+
+    input.addEventListener('input', updatePreview);
     window.onload = updatePreview;
 </script>
 
